@@ -2,29 +2,26 @@
 
 import os
 import subprocess
-
-subprocess.run(["sudo", "apt", "install", "-y", "curl", "unzip"])
-
-URL = "https://fnm.vercel.app/install"
-
-CURL = subprocess.run(["curl", "-fsSL", URL], text=True, shell=True, capture_output=True)
-CURL = CURL.stdout
-subprocess.run(["bash", CURL], shell=True)
-
+import time
+from tqdm import tqdm
 
 APPEND = """
-
   # fnm
-  export PATH="/home/elliot/.local/share/fnm:$PATH"
+  export PATH="$HOME/.local/share/fnm:$PATH"
   eval "`fnm env`"
 
 """
 
- 
-BASHRC = input("please enter the location of your .bashrc: ")
+C1 = "curl -fsSL https://fnm.vercel.app/install | bash"
+C2 = f"sudo echo {APPEND} >> ~/.bashrc"
+C3 = "source ~/.bashrc" 
+COMMANDS = [C1, C2, C3]
 
-file = open(BASHRC, "a")
-file.write(APPEND)
-file.close()
+def SPR(command):
+    subprocess.run(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-subprocess.run(["source", BASHRC], shell=True)
+t = tqdm(COMMANDS, colour="cyan", desc="Installing FNM")
+
+for i in t:
+    SPR(i)
+    time.sleep(.5)

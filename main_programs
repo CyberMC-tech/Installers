@@ -8,15 +8,12 @@ from tqdm import tqdm
 PROGRAMS = ["cheat", "brave_browser", "fnm", "miniconda", "nerd_font -f VictorMono"]
 
 def install(program):
-    subprocess.run(program, shell=True)
+    subprocess.run(f"./{program}", shell=True)
 
-t = tqdm(PROGRAMS, colour="cyan")
+t = tqdm(PROGRAMS, colour="cyan", desc="Installing main programs")
 
 os.system("clear")
 print("Starting main install")
 for i in t:
-    t.set_description(desc=f"Installing {i}")
-    time.sleep(3)
-    i = f"./{i}"
     install(i)
     time.sleep(3)

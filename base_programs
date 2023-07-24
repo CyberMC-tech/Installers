@@ -15,7 +15,7 @@ lightyellow = "\033[93m"
 lightblue = "\033[94m"
 lightaqua = "\033[96m"
 
-PROGRAMS = ["tldr", "gedit", "vscode", "w3m", "ranger", "fzf", "neovim", "unzip", "wget", "git", "curl", "docker.io", "docker-compose"]
+PROGRAMS = ["tldr", "gedit", "code", "w3m", "ranger", "fzf", "neovim", "unzip", "wget", "git", "curl", "docker.io", "docker-compose"]
 
 def install(program):
     program = f"sudo nala install {program} -y"
