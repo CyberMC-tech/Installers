@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+
+subprocess.run(["sudo", "apt", "install", "-y", "curl", "unzip"])
+
+URL = "https://fnm.vercel.app/install"
+
+CURL = subprocess.run(["curl", "-fsSL", URL], text=True, shell=True, capture_output=True)
+CURL = CURL.stdout
+subprocess.run(["bash", CURL], shell=True)
+
+
+APPEND = """
+
+  # fnm
+  export PATH="/home/elliot/.local/share/fnm:$PATH"
+  eval "`fnm env`"
+
+"""
+
+ 
+BASHRC = input("please enter the location of your .bashrc: ")
+
+file = open(BASHRC, "a")
+file.write(APPEND)
+file.close()
+
+subprocess.run(["source", BASHRC], shell=True)
