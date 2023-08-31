@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#Install QEMU and all needed dependencies
+paru -S --nouseask qemu-full virt-manager virt-viewer dnsmasq vde2 bridge-utils openbsd-netcat dmidecode
+
+#Install the ebtables and iptables so we can bridge our network
+paru -S --nouseask ebtables iptables
+
+#Install libguestfs so we can share other devices like USB
+paru -S --nouseask libguestfs
+
+#Enable the libvirtd daemon during startup 
+sudo systemctl enable libvirtd.service
+sudo systemctl start libvirtd.service
+
+#These are just instruction for editing the configuration file
+echo '''
+You now need to add yourself to manage the KVM.
+
+You need to edit the libvirtd.conf file /etc/libvirt/libvirtd.conf
+
+set the UNIX domain socket group ownership to libvirt (Should be around line 85)
+unix_sock_group = "libvirt"
+
+set the UNIX socket permission for the R/W socket (SHould be around line 102)
+unix_sock_rw_perms = "0770"
+
+'''
+
+#This is just here to put a pause in the program while the user update the .conf file
+echo "Press Enter when Finished with the above instructions."
+read 
+
+#Add ourselves to the libvirt group
+sudo usermod -a -G libvirt $(whoami)
+
+#Adding the libvirt group
+newgrp libvirt
+
+#Restarting the libvirt daemon so settings can be applied
+sudo systemctl restart libvirtd.service
+
