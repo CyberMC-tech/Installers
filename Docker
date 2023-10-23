@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+
+
+# Function to display progress bar
+
+display_progress() {
+
+    local width=50
+
+    local percent=$1
+
+    local filled=$(printf "%0.s#" $(seq 1 $((width * percent / 100))))
+
+    local empty=$(printf "%0.s-" $(seq 1 $((width - width * percent / 100))))
+
+    echo -ne "\r[$filled$empty] $percent%"
+
+}
+
+
+
+# Function to handle user confirmation
+
+user_confirmation() {
+
+    read -p "Do you want to continue? [y/N]: " choice
+
+    case "$choice" in
+
+        y|Y) echo "Installing Docker please wait..." ;;
+
+        *) echo "Exiting..."; exit 1 ;;
+
+    esac
+
+}
+
+
+
+# Function to install Docker dependencies
+
+install_dependencies() {
+
+    echo "Installing dependencies..."
+
+    sudo apt-get update || { echo "Failed at apt-get update"; exit 1; }
+
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common || { echo "Failed at installing dependencies"; exit 1; }
+
+}
+
+
+
+# Function to install Docker
+
+install_docker() {
+
+    echo "Installing Docker..."
+
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - || { echo "Failed at adding Docker GPG key"; exit 1; }
+
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" || { echo "Failed at adding Docker repository"; exit 1; }
+
+    sudo apt-get update || { echo "Failed at apt-get update"; exit 1; }
+
+    sudo apt-get install -y docker-ce || { echo "Failed at installing Docker"; exit 1; }
+
+}
+
+
+
+# Main script
+
+echo "This script will install Docker on your Debian-based system."
+
+user_confirmation
+
+
+
+for i in {0..100}; do
+
+    display_progress $i
+
+    sleep 0.1
+
+done
+
+echo
+
+
+
+# Add user to docker group so you don't need to call sudo when using docker
+
+sudo usermod -aG docker "$USER" && echo -e "User ${USER} added to the docker group\n\nYou must logout and login or restart fo changes to take affect." || echo "Unable to add ${USER} to the docker group."
+
+
+
+install_dependencies
+
+install_docker
+
+
+
+echo "Docker installation completed successfully."#
+#!/usr/bin/env bash
+
+
+# Function to display progress bar
+display_progress() {
+  local width=50
+  local percent=$1
+  local filled=$(printf "%0.s#" $(seq 1 $((width * percent / 100))))
+  local empty=$(printf "%0.s-" $(seq 1 $((width - width * percent / 100))))
+  echo -ne "\r[$filled$empty] $percent%"
+}
+
+# Function to handle user confirmation
+user_confirmation() {
+  read -p "Do you want to continue? [y/N]: " choice
+  case "$choice" in
+    y|Y) echo "Installing Docker please wait...";;
+    *) echo "Exiting..."; exit 1;;
+  esac
+}
+
+# Function to install Docker dependencies
+install_dependencies() {
+  echo "Installing dependencies..."
+  sudo apt-get update || { echo "Failed at apt-get update"; exit 1; }
+  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common || { echo "Failed at installing dependencies"; exit 1; }
+}
+
+# Function to install Docker
+install_docker() {
+  echo "Installing Docker..."
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - || { echo "Failed at adding Docker GPG key"; exit 1; }
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" || { echo "Failed at adding Docker repository"; exit 1; }
+  sudo apt-get update || { echo "Failed at apt-get update"; exit 1; }
+  sudo apt-get install -y docker-ce || { echo "Failed at installing Docker"; exit 1; }
+}
+
+# Main script
+echo "This script will install Docker on your Debian-based system."
+user_confirmation
+
+for i in {0..100}; do
+  display_progress $i
+  sleep 0.1
+done
+echo
+
+install_dependencies
+install_docker
+
+echo "Docker installation completed successfully."

@@ -1,0 +1,145 @@
+#!/bin/bash
+
+###############################################
+#           Created by CyberMC-Tech           #
+#   Github: https://github.com/CyberMC-Tech   #
+###############################################
+
+# Description: NvChad install script for debian testing "trixie" and ubuntu 
+
+# NOTE: THIS WILL NOT WORK ON DEBIAN BOOKWORM ONLY TESTING!!
+
+###########################################################################################
+# Update list and upgrade all modules
+
+update_upgrade() {
+	sudo apt update && sudo apt upgrade -y
+	install_depends
+}
+
+###########################################################################################
+# Installs required dependencies
+
+install_depends() {
+	sudo apt install -y git curl ripgrep &&
+  neovim
+  delete_nvim
+}
+
+###########################################################################################
+# Installs neovim version 0.9.0 for telescope
+
+neovim() {
+  curl -LOs https://github.com/neovim/neovim/releases/download/v0.9.0/nvim-linux64.tar.gz
+  tar xzf nvim-linux64.tar.gz
+  sudo cp --recursive --force nvim-linux64/* /usr/
+  rm -rf nvim-linux64.tar.gz nvim-linux64 
+}
+	
+# Installs the nvchad setup to .config/nvim folder
+
+nvchad_setup() {
+	git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1
+  success
+}
+
+############################################################################################################
+# Ask the user if they want to install
+
+confirm() {
+	echo -e "\nYou are about to install ${1}."
+	sleep 2
+	echo -e "\nBe sure to backup your current nvim config first!"
+	sleep 2
+	echo -e "\nAre you ready to install?"
+	sleep 2
+	echo -en "\n[(Y)es|(n)o]: "
+	read -r response
+	check_ans "$response"
+}
+
+############################################################################################################
+# Exit the script
+
+abort() {
+	echo -e "\nAborting installation...\n"
+	sleep 2
+	exit 0
+}
+
+############################################################################################################
+# Rerun command until user answers Y or N
+
+unknown_response() {
+	echo -e "\nInvalid option\n"
+	sleep 2
+	echo -e "Please enter a vaild response\n"
+	sleep 2
+	confirm
+}
+
+############################################################################################################
+# Deletes the previous nvim config at $HOME/.config/nvim
+
+delete_nvim() {
+	rm -rf "$HOME/.config/nvim"
+	rm -rf "$HOME/.local/share/nvim"
+	nvchad_setup
+}
+
+############################################################################################################
+# Error message if something fails with function name. Helpful for debugging
+
+error() {
+	echo -e "\nError: recieved a non-zero return code when running command \"${1}\""
+  sleep 2
+	echo -e "\nPlease check network connection and try again."
+	sleep 2
+	exit 1
+}
+
+#############################################################################################################
+# This is here to make the code easier to understand begins the installation process
+
+install_program() {
+  echo -e "\nBeginning installation of NvChad\n"
+  sleep 2
+	update_upgrade
+}
+
+#############################################################################################################
+# Check if user typed yes or no
+
+check_ans() {
+	ans=$(echo "${1::1}" | tr "[:upper:]" "[:lower:]")
+
+	if [[ "$ans" == "y" ]] || [[ "$ans" == "" ]]; then
+		install_program
+	elif [[ "$ans" == "n" ]]; then
+		abort
+	else
+		unknown_response
+	fi
+}
+
+#############################################################################################################
+# Lets user know install was successful
+
+success() {
+	echo -e "\nNvChad successfully installed\n\nYou can now start neovim by typing nvim.\n"
+	sleep 2
+	exit 0
+}
+
+#############################################################################################################
+# Main function for good practice and other possible uses
+
+main() {
+	confirm "NvChad"
+}
+
+#############################################################################################################
+# Run the main function. This is just good practice
+
+main
+

@@ -1,0 +1,89 @@
+#!/bin/bash
+
+
+############################################################
+#         Installer for Docker Desktop on mx linux         #
+#            Created By: CyberMC-tech@github.com           #
+#   Github Repo: https://github.com/CyberMC-tech/mx-linux  #
+############################################################
+
+
+DEPENDENCIES=( "curl" "sudo" "wget" )
+
+
+IS_INSTALLED() {
+# Checking if curl is installed
+  local dependency="$1"
+  if ! which "$dependency" > /dev/null; then
+    echo -e "${dependency} is needed to install Docker Desktop\n"
+    echo -e "Would you like to install ${dependency} now?\n"
+    if $(gum confirm); then
+      sudo apt-get -y install "$dependency"
+    else
+      echo -e "Aborting installation...\n"
+      sleep 2 && exit 1
+    fi
+  fi
+}
+
+
+CHECK_DEPENDS() {
+  for i in ${DEPENDENCIES[@]}; do
+    IS_INSTALLED "$i"
+  done
+}
+
+
+DEPENDS() {
+  gum spin --title="Checking dependencies please wait..."  --show-output CHECK_DEPENDS 
+}
+  
+
+ADD_GPG() {
+# Add Docker's official GPG key:
+  sudo apt-get update 
+  sudo apt-get -y install ca-certificates curl gnupg
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+}
+
+
+ADD_REPO() {
+# Add the repository to Apt sources:
+  echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+}
+
+
+DOWNLOAD_PACKAGE() {
+# Download the debian package 
+  wget "https://desktop.docker.com/linux/main/amd64/docker-desktop-4.23.0-amd64.deb"
+}
+
+
+INSTALL_PACKAGE() {
+# Install the package using the package you just installed
+  sudo apt-get update 
+  sudo apt-get install -y ./docker-desktop-4.23.0-amd64.deb
+}
+
+
+LAUNCH() {
+# Launch Docker Desktop
+  ./opt/docker-desktop/bin/docker-desktop
+}
+
+main() {
+  DEPENDS
+  ADD_GPG
+  ADD_REPO
+  DOWNLOAD_PACKAGE
+  INSTALL_PACKAGE
+  LAUNCH
+}
+
+main

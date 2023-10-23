@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo -e "\n${green}Installing${lightpurple} starship...${normal}"
+curl -s -O https://starship.rs/install.sh &&
+sudo chmod +x install.sh
+./install.sh
+rm install.sh
+
+
