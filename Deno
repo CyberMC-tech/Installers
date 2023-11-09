@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+
+usage(){
+
+  cat << EOF
+          Deno
+-----------------------------------------------------------------------
+
+Next-generation JavaScript Runtime
+}
+
+
+
+## referehttps://deno.com/
+
+
+curl -fsSL https://deno.land/x/install/install.sh | sh
